@@ -5,34 +5,29 @@
 - PHP >= 8.2
 - Composer
 - Node.js & npm
-- SQLite/MySQL/PostgreSQL
+- MySQL
 - Docker & Docker Compose (optional, for containerized database)
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd task-manager
-```
 
-2. Install PHP dependencies:
+1. Install PHP dependencies:
 ```bash
 composer install
 ```
 
-3. Install Node.js dependencies:
+2. Install Node.js dependencies:
 ```bash
 npm install
 ```
 
-4. Set up environment file:
+3. Set up environment file:
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-5. Configure your database:
+4. Configure your database:
 
    Option A: Local Database
    - Update the database configuration in your `.env` file with your database credentials
@@ -52,7 +47,7 @@ php artisan key:generate
      DB_PASSWORD=root
      ```
 
-6. Run migrations:
+5. Run migrations:
 ```bash
 php artisan migrate
 ```
