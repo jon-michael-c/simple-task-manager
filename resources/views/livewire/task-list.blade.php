@@ -8,11 +8,55 @@
             @endforeach
         </select>
     </div>
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold">Create Task</h2>
-        <form wire:submit.prevent="createTask" class="mt-4 space-y-4">
-            <div class="flex gap-2">
-                <div class="flex-1">
+
+    <!-- Project Section -->
+    <div class="mt-8 p-6 border border-gray-700 rounded-lg bg-gray-900">
+        <h2 class="text-xl font-semibold mb-4">Manage Projects</h2>
+        <div class="space-y-4">
+            @if($showNewProjectInput)
+                <form wire:submit.prevent="createProject" class="space-y-4">
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <input type="text" 
+                                   wire:model="newProjectName" 
+                                   placeholder="New Project Name"
+                                   class="w-full border p-2 rounded bg-gray-800 text-gray-100">
+                            @error('newProjectName') 
+                                <span class="text-red-500 text-sm block">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="flex gap-2">
+                            <x-button 
+                                type="submit"
+                                variant="success">
+                                Add Project
+                            </x-button>
+                            <x-button 
+                                wire:click.prevent="toggleNewProjectInput"
+                                variant="secondary">
+                                Cancel
+                            </x-button>
+                        </div>
+                    </div>
+                </form>
+            @else
+                <div class="flex justify-end">
+                    <x-button 
+                        wire:click.prevent="toggleNewProjectInput"
+                        variant="primary">
+                        Create New Project
+                    </x-button>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Task Section -->
+    <div class="mt-8 p-6 border border-gray-700 rounded-lg bg-gray-900">
+        <h2 class="text-xl font-semibold mb-4">Create Task</h2>
+        <form wire:submit.prevent="createTask" class="space-y-4">
+            <div class="space-y-4">
+                <div>
                     <input type="text" 
                            wire:model="newTaskName" 
                            placeholder="Task Name"
@@ -22,44 +66,13 @@
                     @enderror
                 </div>
                 
-                <div class="flex-1">
-                    @if($showNewProjectInput)
-                        <div class="flex gap-2">
-                            <div class="flex-1">
-                                <input type="text" 
-                                       wire:model="newProjectName" 
-                                       placeholder="New Project Name"
-                                       class="w-full border p-2 rounded bg-gray-800 text-gray-100">
-                                @error('newProjectName') 
-                                    <span class="text-red-500 text-sm block">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <x-button 
-                                wire:click.prevent="createProject"
-                                variant="success">
-                                Add
-                            </x-button>
-                            <x-button 
-                                wire:click.prevent="toggleNewProjectInput"
-                                variant="secondary">
-                                Cancel
-                            </x-button>
-                        </div>
-                    @else
-                        <div class="flex gap-2">
-                            <select wire:model="newTaskProject" class="flex-1 border p-2 rounded bg-gray-800 text-gray-100">
-                                <option value="">Select Project (optional)</option>
-                                @foreach($projects as $project)
-                                    <option value="{{ $project->id }}">{{ $project->name }}</option>
-                                @endforeach
-                            </select>
-                            <x-button 
-                                wire:click.prevent="toggleNewProjectInput"
-                                variant="primary">
-                                New Project
-                            </x-button>
-                        </div>
-                    @endif
+                <div>
+                    <select wire:model="newTaskProject" class="w-full border p-2 rounded bg-gray-800 text-gray-100">
+                        <option value="">Select Project (optional)</option>
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}">{{ $project->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -72,6 +85,8 @@
             </div>
         </form>
     </div>
+
+    <!-- Task List -->
     <div class="mt-8">
         <h2 class="text-xl font-semibold">Task List</h2>
         <ul wire:sortable="reorder" class="grid gap-4 mt-4">

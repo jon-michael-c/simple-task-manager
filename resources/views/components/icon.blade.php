@@ -1,6 +1,6 @@
 @props([
     'name',
-    'size' => 'w-5 h-5'
+    'size' => 'w-4 h-4'
 ])
 
 @switch($name)

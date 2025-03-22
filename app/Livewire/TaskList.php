@@ -30,9 +30,16 @@ class TaskList extends Component
     #[Rule('required|min:3')]
     public $editingTaskName = '';
 
+    public $confirmingDelete = null;
+
     public function mount()
     {
         $this->projects = Project::all();
+        $this->loadTasks();
+    }
+
+    public function updatedSelectedProject()
+    {
         $this->loadTasks();
     }
 
@@ -116,9 +123,20 @@ class TaskList extends Component
         $this->reset(['editingTaskId', 'editingTaskName']);
     }
 
+    public function confirmDelete($taskId)
+    {
+        $this->confirmingDelete = $taskId;
+    }
+
+    public function cancelDelete()
+    {
+        $this->confirmingDelete = null;
+    }
+
     public function deleteTask($taskId)
     {
         Task::destroy($taskId);
+        $this->confirmingDelete = null;
         $this->loadTasks();
     }
 

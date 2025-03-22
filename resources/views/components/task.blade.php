@@ -36,12 +36,26 @@
                     variant="primary">
                     <x-icon name="edit" />
                 </x-button>
-                <x-button 
-                    wire:click="deleteTask({{ $task->id }})"
-                    wire:confirm="Are you sure you want to delete this task?"
-                    variant="danger">
-                    <x-icon name="trash" />
-                </x-button>
+                @if($confirmingDelete === $task->id)
+                    <div class="inline-flex space-x-2">
+                        <x-button 
+                            wire:click="deleteTask({{ $task->id }})"
+                            variant="success">
+                            <x-icon name="check" />
+                        </x-button>
+                        <x-button 
+                            wire:click="cancelDelete"
+                            variant="danger">
+                            <x-icon name="x" />
+                        </x-button>
+                    </div>
+                @else
+                    <x-button 
+                        wire:click="confirmDelete({{ $task->id }})"
+                        variant="danger">
+                        <x-icon name="trash" />
+                    </x-button>
+                @endif
             </div>
         </div>
     @endif
