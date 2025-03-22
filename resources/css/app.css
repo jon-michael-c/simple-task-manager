@@ -12,14 +12,15 @@
 }
 
 .sortable-drag {
-    opacity: 0.75;
+    opacity: 0.85;
     background-color: #4f46e5;
     color: #fff;
-    border: 2px dashed #c7d2fe;
+    border: 2px solid #c7d2fe;
 }
 
 .sortable-ghost {
     opacity: 0.4;
+    border: 2px dashed #c7d2fe; 
 }
 
 .sortable-chosen {

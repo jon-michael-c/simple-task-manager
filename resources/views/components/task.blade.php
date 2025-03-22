@@ -1,45 +1,48 @@
-<div x-data="{ editing: false, name: '{{ addslashes($task->name) }}' }"
-    class="p-4 border rounded shadow-sm bg-zinc-800">
-    <template x-if="!editing">
+<div class="p-4 border rounded shadow-sm bg-zinc-800 hover:cursor-grab">
+    @if($editingTaskId === $task->id)
+        <form wire:submit.prevent="updateTask" class="flex items-center space-x-2">
+            <input type="text" 
+                   wire:model="editingTaskName"
+                   class="flex-1 bg-gray-900 border border-gray-700 p-1 rounded text-gray-100"
+                   wire:keydown.escape="cancelEdit">
+            @error('editingTaskName') 
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+            @enderror
+            <x-button 
+                type="submit"
+                variant="success">
+                <x-icon name="check" />
+            </x-button>
+            <x-button 
+                type="button"
+                variant="danger"
+                wire:click="cancelEdit">
+                <x-icon name="x" />
+            </x-button>
+        </form>
+    @else
         <div class="flex justify-between items-center">
             <div>
                 <h3 class="text-lg font-semibold">
-                    {{ $task->priority }}. <span x-text="name"></span>
+                    {{ $task->priority }}. {{ $task->name }}
                 </h3>
                 @if($task->project)
                     <p class="text-sm text-gray-500">Project: {{ $task->project->name }}</p>
                 @endif
             </div>
             <div class="space-x-2">
-                <!-- Toggle edit mode -->
-                <button @click="editing = true" class="text-blue-500 hover:underline">Edit</button>
-                <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-red-500 hover:underline">Delete</button>
-                </form>
+                <x-button 
+                    wire:click="startEditing({{ $task->id }})"
+                    variant="primary">
+                    <x-icon name="edit" />
+                </x-button>
+                <x-button 
+                    wire:click="deleteTask({{ $task->id }})"
+                    wire:confirm="Are you sure you want to delete this task?"
+                    variant="danger">
+                    <x-icon name="trash" />
+                </x-button>
             </div>
         </div>
-    </template>
-
-    <template x-if="editing">
-        <form x-on:submit.prevent="
-            fetch('{{ route('tasks.update', $task) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-HTTP-Method-Override': 'PUT'
-                },
-                body: JSON.stringify({ name: name })
-            }).then(response => {
-                if (response.ok) { editing = false; }
-                else { alert('Update failed'); }
-            });
-        " class="flex items-center space-x-2">
-            <input type="text" x-model="name" class="bg-gray-900 border border-gray-700 p-1 rounded text-gray-100">
-            <button type="submit" class="text-green-500 hover:underline">Save</button>
-            <button type="button" @click="editing = false" class="text-red-500 hover:underline">Cancel</button>
-        </form>
-    </template>
+    @endif
 </div>

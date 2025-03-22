@@ -1,47 +1,56 @@
-import Sortable from "sortablejs";
+import './bootstrap';
+import Sortable from 'sortablejs';
 
-document.addEventListener("DOMContentLoaded", () => {
-    const taskList = document.getElementById("task-list");
+/**
+ * Configuration for Sortable.js
+ */
+const SORTABLE_CONFIG = {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    handle: '[wire\\:sortable\\.handle]'
+};
 
-    const csrfToken = document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content");
-    const reorderUrl = document
-        .querySelector('meta[name="reorder-url"]')
-        .getAttribute("content");
+/**
+ * Initialize Sortable.js for a given element
+ * @param {HTMLElement} element - The element to make sortable
+ */
+function createSortableInstance(element) {
+    const component = window.Livewire.find(
+        element.closest('[wire\\:id]')?.getAttribute('wire:id')
+    );
 
-    if (taskList) {
-        Sortable.create(taskList, {
-            animation: 150,
-            ghostClass: "sortable-ghost",
-            chosenClass: "sortable-chosen",
-            dragClass: "sortable-drag",
-            onEnd: async () => {
-                const order = Array.from(
-                    taskList.querySelectorAll(".task-item")
-                ).map((item) => item.dataset.id);
-                try {
-                    const response = await fetch(reorderUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                        },
-                        body: JSON.stringify({ order }),
-                    });
-                    if (response.ok) {
-                        console.log("Order updated successfully!");
-                        // Optionally update UI without reload.
-                    } else {
-                        console.error(
-                            "Error updating order:",
-                            response.statusText
-                        );
-                    }
-                } catch (error) {
-                    console.error("Fetch error:", error);
-                }
-            },
-        });
-    }
-});
+    if (!component) return;
+
+    const method = element.getAttribute('wire:sortable');
+
+    Sortable.create(element, {
+        ...SORTABLE_CONFIG,
+        onEnd: () => {
+            const items = [...element.querySelectorAll('[wire\\:sortable\\.item]')]
+                .map(item => item.getAttribute('wire:sortable.item'));
+            component.call(method, items);
+        }
+    });
+
+    // Mark as initialized
+    element.classList.add('sortable-initialized');
+}
+
+/**
+ * Initialize Sortable.js for all sortable elements
+ */
+function initializeSortable() {
+    document.querySelectorAll('[wire\\:sortable]').forEach(element => {
+        // Skip if already initialized
+        if (!element.classList.contains('sortable-initialized')) {
+            createSortableInstance(element);
+        }
+    });
+}
+
+// Initialize when Livewire is ready
+document.addEventListener('livewire:initialized', initializeSortable);
+
+// Re-initialize when Livewire updates the DOM
+document.addEventListener('livewire:navigated', initializeSortable);
